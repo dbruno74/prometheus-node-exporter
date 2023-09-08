@@ -10,8 +10,16 @@ confinement: strict # use 'strict' once you have the right plugs and slots
 
 apps:
   node-export:
-    command: usr/bin/node_exporter
+    command: usr/bin/node_exporter --collector.systemd
     daemon: simple
+    plugs:
+      - system-observe
+      - system-trace
+      - hardware-observe
+      - network
+      - network-bind
+      - network-control
+      - mount-observe
 
 parts:
   node-exporter:
@@ -19,15 +27,11 @@ parts:
     source: https://github.com/prometheus/node_exporter
     source-type: git
     source-tag: v1.6.1
+    build-packages:
+      - build-essential
     build-snaps:
        - go
     override-build: |
         make build
         mkdir -p $CRAFT_PART_INSTALL/usr/bin
         cp node_exporter $CRAFT_PART_INSTALL/usr/bin
-
-plugs:
-  system-observe:
-  system-trace:
-
-
